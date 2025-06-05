@@ -10,7 +10,7 @@ from openai_client.openai_client import openai_client
 from openai_client.openai_prompt import validate_image_prompt, create_image_message, validate_image_message
 import base64
 import json
-from uuid import UUID
+from enums.http_error import HttpError
 class ImageService:
     def __init__(self, db: AsyncSession):
         self.metadata_repository = MetadataRepository(db)
@@ -42,7 +42,7 @@ class ImageService:
         # Retrieve metadata from the database
         metadata = await self.metadata_repository.get_metadata(metadata_id)
         if not metadata:
-            raise ValueError("Metadata not found")
+            return HttpError.METADATA_NOT_FOUND.value
         
         image_base64 = self.file_service.read_image_as_base64(metadata.path)
 
@@ -59,10 +59,10 @@ class ImageService:
 
         is_valid = args["is_nutrition_facts"]
         if is_valid:
-            self.metadata_repository.update_metadata(
+            await self.metadata_repository.update_metadata(
             metadata_id,
             {"is_valid": is_valid}
             )
             return "Image is valid"
-        return "Image is not valid"
+        return HttpError.IMAGE_NOT_VALID.value
         

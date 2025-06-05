@@ -25,7 +25,8 @@ class MetadataRepository:
                 setattr(metadata, key, value)
             await self.db.commit()
             await self.db.refresh(metadata)
-        return metadata
+            return metadata
+        return None
 
     async def delete_metadata(self, metadata_id: str):
         metadata = await self.get_metadata(metadata_id)

@@ -8,6 +8,8 @@ from database.connection import DatabaseConnection
 from schemas.metadata_schema import MetadataSchema, MetadataValidationSchema
 from services.image_service import ImageService
 from services.ocr_service import OCRService
+from enums.http_error import HttpError
+from fastapi import HTTPException
 
 db = DatabaseConnection()
 
@@ -26,7 +28,7 @@ async def upload_image_task(input: MetadataSchema, ctx: Context) -> str:
         image_service = ImageService(session)
         metadata = await image_service.save_metadata(input)
         metadata_id = metadata.id
-        return metadata_id
+        return {"transformed_message": metadata_id} 
     
 @hatchet.task(
     name="validate_image_task",
@@ -38,7 +40,8 @@ async def validate_image_task(input: MetadataValidationSchema, ctx: Context) -> 
     """
     async with db.get_session() as session:
         image_service = ImageService(session)
-        return await image_service.validate_image(input.metadata_id)
+        result = await image_service.validate_image(input.metadata_id)
+        return result
     
 @hatchet.task(
     name="extract_text_task",
@@ -50,5 +53,7 @@ async def extract_text_task(input: MetadataValidationSchema, ctx: Context) -> bo
     """
     async with db.get_session() as session:
         ocr_service = OCRService(session)
-        return await ocr_service.extract_text(input.metadata_id)
+        result = await ocr_service.extract_text(input.metadata_id)
+        return result
+        
        

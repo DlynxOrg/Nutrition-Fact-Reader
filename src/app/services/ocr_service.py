@@ -3,6 +3,7 @@ from openai_client.openai_prompt import extract_text_message, create_image_messa
 from services.file_service import FileService
 from repositories.metadata_repository import MetadataRepository
 import json
+from enums.http_error import HttpError
 
 class OCRService:
     def __init__(self, db):
@@ -12,9 +13,9 @@ class OCRService:
     async def extract_text(self, metadata_id: str) -> str:
         metadata = await self.metadata_repository.get_metadata(metadata_id)
         if not metadata:
-            raise ValueError("Metadata not found")
+            return HttpError.METADATA_NOT_FOUND.value
         if not metadata.is_valid:
-            raise ValueError("Image is not valid for OCR extraction")
+            return HttpError.IMAGE_NOT_VALIDATED_FOR_OCR.value
         
         image_base64 = self.file_service.read_image_as_base64(metadata.path)
 
