@@ -56,4 +56,11 @@ To run the application, follow these steps:
    ```bash
    uv run hatchet_workers.py
    ```
+## API Documentation
+
+You can access the Swagger API documentation at:
+
+```
+http://localhost:8000/docs
+```
 Ensure that the database is accessible and the credentials are correct before running the application.
