@@ -1,7 +1,9 @@
 import os
-from sqlmodel import create_engine, Session
 from models.models import SQLModel
+from sqlmodel import create_engine
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
+from typing import AsyncGenerator
+from contextlib import asynccontextmanager
 
 
 from threading import Lock
@@ -24,12 +26,16 @@ class DatabaseConnection:
         self.connection_string = os.getenv("OCR_PSQL_DB_URL")
         if not self.connection_string:
             raise ValueError("DATABASE_URL environment variable is not set.")
-        self.engine = create_engine(self.connection_string, echo=True)
+        self.engine = create_async_engine(self.connection_string, echo=True, future=True)
         self._initialized = True
+        self.async_session_maker = async_sessionmaker(self.engine, class_=AsyncSession, expire_on_commit=False)
 
-    def create_tables(self):
-        SQLModel.metadata.create_all(self.engine)
 
-    def get_session(self):
-        with Session(self.engine) as session:
+    async def create_db_and_tables(self):
+        async with self.engine.begin() as conn:
+            await conn.run_sync(SQLModel.metadata.create_all)
+
+    @asynccontextmanager
+    async def get_session(self) -> AsyncGenerator[AsyncSession, None]:
+        async with self.async_session_maker() as session:
             yield session
