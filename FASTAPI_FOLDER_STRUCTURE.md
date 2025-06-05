@@ -17,8 +17,10 @@ fastapi_project/
 │   │   ├── __init__.py
 │   │   ├── main.py          # Entry point for the FastAPI app
 │   │   ├── config.py        # Configuration settings
+│   │   ├── database/        # Database connection logic
 │   │   ├── dependencies.py  # Dependency injection
 │   │   ├── routers/         # API route definitions
+│   │   ├── repositories/    # Database interaction layer
 │   │   │   ├── __init__.py
 │   │   │   ├── example.py   # Example route
 │   │   ├── models/          # Database models
@@ -27,12 +29,15 @@ fastapi_project/
 │   │   ├── schemas/         # Pydantic models for request/response validation
 │   │   │   ├── __init__.py
 │   │   │   ├── user.py
-│   │   ├── services/        # Business logic and worker tasks
+│   │   ├── services/        # Business logic
+│   │   │   ├── __init__.py
+│   │   │   ├── example_service.py  # Example service
+│   │   ├── tasks/           # Task definitions managed by Hatchet
+│   │   │   ├── __init__.py
+│   │   │   ├── example_task.py
+│   │   ├── workers/         # Worker implementations managed by Hatchet
 │   │   │   ├── __init__.py
 │   │   │   ├── hatchet_worker.py  # Hatchet worker integration
-│   │   ├── utils/           # Utility functions
-│   │   │   ├── __init__.py
-│   │   │   ├── helpers.py
 │   ├── tests/               # Unit and integration tests
 │   │   ├── __init__.py
 │   │   ├── test_main.py
@@ -46,7 +51,9 @@ fastapi_project/
 4. **`src/app/routers/`**: Contains all API route definitions, organized by feature.
 5. **`src/app/models/`**: Defines database models using an ORM like SQLAlchemy.
 6. **`src/app/schemas/`**: Contains Pydantic models for request and response validation.
-7. **`src/app/services/`**: Implements business logic and integrates with Hatchet for worker management.
+7. **`src/app/services/`**: Contains business logic that is independent of tasks and workers.
+8. **`src/app/tasks/`**: Defines tasks managed by Hatchet SDK.
+9. **`src/app/workers/`**: Implements workers managed by Hatchet SDK, including integrations like `hatchet_worker.py`.
 8. **`src/app/utils/`**: Contains utility functions and helpers.
 9. **`src/tests/`**: Includes unit and integration tests for the application.
 
